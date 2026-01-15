@@ -52,7 +52,7 @@ def get_text_from_title_region():
 
     print("Extracted Title Text:", title_text)
 
-    episode_number = extract_episode_number(title_text)
+    episode_number = str(extract_episode_number(title_text))
     title = extract_title(title_text)
     print (f"Extracted Episode Number: |{episode_number}|")
     print (f"Extracted Title: |{title}|")

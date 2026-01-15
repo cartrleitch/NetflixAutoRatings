@@ -34,7 +34,7 @@ def get_rating_by_title(title):
 
     return get_rating_by_episode_id(target_title_id)
      
-print(f'Average rating for desired episode: {get_rating_by_title(episode_title)}')
+#print(f'Average rating for desired episode: {get_rating_by_title(episode_title)}')
 
 def get_rating_by_episode(target_parent_id, target_episode_num):
     episodes = open("title.episode.tsv", "r", encoding="utf-8")
@@ -52,4 +52,4 @@ def get_rating_by_episode(target_parent_id, target_episode_num):
             
     return "Rating not found." 
 
-# print(f'Average rating for desired episode: {get_rating_by_episode("tt0388629", "723")}')  # One Piece 
+# print(f'Average rating for desired episode: {get_rating_by_episode("tt0388629", "601")}')  # One Piece 
