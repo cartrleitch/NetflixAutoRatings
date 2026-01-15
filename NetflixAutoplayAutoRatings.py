@@ -1,6 +1,7 @@
 import pyautogui
 import time
 import NetflixAutoRatings as ar
+import ExtractTitle as et
 
 # Netflix must be 100% scale for the images to be detected properly.
 
@@ -50,6 +51,8 @@ while True:
         move_center()
         skipped_intros += 1
         print("Intros skipped: " + str(skipped_intros))
+        time.sleep(1)
+        print(et.get_text_from_title_region())
         
         time.sleep(1)
 

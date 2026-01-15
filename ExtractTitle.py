@@ -1,5 +1,4 @@
 import pyautogui
-import time
 import cv2
 import numpy as np
 import pytesseract
@@ -24,7 +23,6 @@ def extract_title(text):
 def get_text_from_title_region():
     screen_size = p.size()
     print (f"Screen size: {screen_size}")
-    screen_size = p.size()
     screen_x = screen_size[0]
     screen_y = screen_size[1]
 
@@ -38,17 +36,15 @@ def get_text_from_title_region():
     print("title_window_w:", title_window_w)
     print("title_window_h:", title_window_h)
 
-    
-    time.sleep(2)
     screenshot = pyautogui.screenshot(region=(title_window_x, title_window_y, title_window_w, title_window_h))
     screenshot.save("netflix_title_raw.png")
     print("Screenshot saved as netflix_title_raw.png")
 
     img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
 
-    cv2.imshow("Post-Processed OCR Input", img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("Post-Processed OCR Input", img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
        
     custom_config = r'--psm 6 tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789:!?. ,\'"-'
     
@@ -63,4 +59,5 @@ def get_text_from_title_region():
     
     return (title, episode_number, title_text)
 
-print(get_text_from_title_region())
+if __name__ == "__main__":
+    print(get_text_from_title_region())
