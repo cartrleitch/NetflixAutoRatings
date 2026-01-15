@@ -45,7 +45,7 @@ while True:
 
     # Select skip intro button
     try:
-        skip_intro_button_location = p.locateCenterOnScreen(r'skip_intro100percent.png', confidence=0.5)
+        skip_intro_button_location = p.locateCenterOnScreen(r'skip_intro100percent.png', confidence=0.8)
         print("Locating skip intro: "+ str(skip_intro_button_location))
         p.leftClick(skip_intro_button_location)
         move_center()
