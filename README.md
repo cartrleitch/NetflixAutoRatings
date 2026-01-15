@@ -10,3 +10,5 @@ Package it in nice executable
 Improve flexibility across different displays and scenarios
 Enhance error handling and edge cases (so it works even if it is weird)
 List episodes watched during a viewing session.
+When mouse goes in certain part of screen, display rating for current episode.
+If the rating cannot be detect, toast that the window must be fullscreen.
