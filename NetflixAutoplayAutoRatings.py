@@ -2,6 +2,7 @@ import pyautogui
 import time
 import NetflixAutoRatings as ar
 import ExtractTitle as et
+import ShowRatingToast as t
 
 # Netflix must be 100% scale for the images to be detected properly.
 
@@ -56,7 +57,8 @@ while True:
         print(title_tuple)
         episode_rating = ar.get_rating_by_episode("tt0388629", title_tuple[1])
         print(f"Episode Rating: {episode_rating}")
-        
+        t.show_rating_toast(f"Episode {title_tuple[1]}", float(episode_rating), duration=4000)
+
     except p.ImageNotFoundException:
         #print("Skip intro button not on screen.")
         pass
