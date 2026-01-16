@@ -1,8 +1,19 @@
+import sys
+import os
+
 episode_title = "I'm Luffy! The Man Who Will Become the Pirate King!"
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 def get_rating_by_episode_id(episode_id):
     try:
-        ratings = open("title.ratings.tsv", "r", encoding="utf-8")
+        ratings = open(resource_path("title.ratings.tsv"), "r", encoding="utf-8")
     except:
         return "Error."
     next(ratings)  # Skip header line
@@ -20,7 +31,7 @@ def get_rating_by_episode_id(episode_id):
 
 def get_rating_by_title(title):
     try:
-        titles = open("title.basics.tsv", "r", encoding="utf-8")
+        titles = open(resource_path("title.basics.tsv"), "r", encoding="utf-8")
         target_title_id = ""
     except:
         return "Error."
@@ -45,7 +56,7 @@ def get_rating_by_title(title):
 
 def get_rating_by_episode(target_parent_id, target_episode_num):
     try:
-        episodes = open("title.episode.tsv", "r", encoding="utf-8")
+        episodes = open(resource_path("title.episode.tsv"), "r", encoding="utf-8")
     except:
         return "Error."
     next(episodes) # Skip header line

@@ -1,10 +1,21 @@
 import pyautogui
 import time
+import sys
+import os
 import NetflixAutoRatings as ar
 import ExtractTitle as et
 import ShowRatingToast as t
 
 # Netflix must be 100% scale for the images to be detected properly on 1920x1080 or 125% on 4k.
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 p = pyautogui
 
@@ -41,9 +52,9 @@ while True:
     # Select next episode button
     try:
         if screen_x >= 3840:
-            next_episode_button_location = p.locateCenterOnScreen(r'next_episode4k.png', confidence=0.6)
+            next_episode_button_location = p.locateCenterOnScreen(resource_path('next_episode4k.png'), confidence=0.6)
         else:
-            next_episode_button_location = p.locateCenterOnScreen(r'next_episode100percent.png', confidence=0.6)
+            next_episode_button_location = p.locateCenterOnScreen(resource_path('next_episode100percent.png'), confidence=0.6)
 
         print("Locating next episode: " + str(next_episode_button_location))
         
@@ -63,9 +74,9 @@ while True:
     # Select skip intro button
     try:
         if screen_x >= 3840:
-            skip_intro_button_location = p.locateCenterOnScreen(r'skip_intro4k125percent.png', confidence=0.8)
+            skip_intro_button_location = p.locateCenterOnScreen(resource_path('skip_intro4k125percent.png'), confidence=0.8)
         else:
-            skip_intro_button_location = p.locateCenterOnScreen(r'skip_intro100percent.png', confidence=0.8)
+            skip_intro_button_location = p.locateCenterOnScreen(resource_path('skip_intro100percent.png'), confidence=0.8)
 
         print("Locating skip intro: "+ str(skip_intro_button_location))
         p.leftClick(skip_intro_button_location)
