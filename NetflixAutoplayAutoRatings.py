@@ -46,7 +46,7 @@ def move_center():
     p.moveTo(int(screen_x/2), int(screen_y/2), 0)
 
 while True:
-    mouse_in_hover = p.position().x > 1550 and p.position().x < 1920 and p.position().y < 200 and p.position().y > 0 and current_episode_number != "" and current_episode_rating != 0.0
+    mouse_in_hover = p.position().x > screen_x*0.8 and p.position().x < screen_x and p.position().y < screen_y*0.18 and p.position().y > 0 and current_episode_number != "" and current_episode_rating != 0.0
     
     if mouse_in_hover and not in_hover_area:
         t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
