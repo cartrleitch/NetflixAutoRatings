@@ -63,7 +63,7 @@ while True:
     # Select next episode button
     try:
         if screen_x >= 3840:
-            next_episode_button_location = p.locateCenterOnScreen(resource_path('next_episode4k.png'), confidence=0.6)
+            next_episode_button_location = p.locateCenterOnScreen(resource_path('next_episode4k125percent.png'), confidence=0.6)
         else:
             next_episode_button_location = p.locateCenterOnScreen(resource_path('next_episode100percent.png'), confidence=0.6)
 
