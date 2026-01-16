@@ -20,25 +20,28 @@ def extract_title(text):
         return title_match.group(1).strip()
     return text.strip()
 
-def get_text_from_title_region():
+def get_text_from_title_region(x=0.17, y=0.92, w=0.6, h=0.05):
     screen_size = p.size()
     print (f"Screen size: {screen_size}")
     screen_x = screen_size[0]
     screen_y = screen_size[1]
 
-    title_window_x = int(screen_x * 0.17)
-    title_window_y = int(screen_y * 0.92)
-    title_window_w = int(screen_x * 0.6)
-    title_window_h = int(screen_y * 0.05)
-
+    title_window_x = int(screen_x * x)
+    title_window_y = int(screen_y * y)
+    title_window_w = int(screen_x * w)
+    title_window_h = int(screen_y * h)
     print("title_window_x:", title_window_x)
     print("title_window_y:", title_window_y)
     print("title_window_w:", title_window_w)
     print("title_window_h:", title_window_h)
 
-    screenshot = pyautogui.screenshot(region=(title_window_x, title_window_y, title_window_w, title_window_h))
-    screenshot.save("netflix_title_raw.png")
-    print("Screenshot saved as netflix_title_raw.png")
+    try:
+        screenshot = pyautogui.screenshot(region=(title_window_x, title_window_y, title_window_w, title_window_h))
+        screenshot.save("netflix_title_raw.png")
+        print("Screenshot saved as netflix_title_raw.png")
+    except Exception as e:
+        print("Error taking screenshot:", e)
+        return None, None, None
 
     img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
 

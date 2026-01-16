@@ -33,8 +33,8 @@ def show_rating_toast(text, rating, duration):
     screen_h = root.winfo_screenheight()
 
     # Position: bottom-right-ish (Netflix safe area)
-    width = 450
-    height = 80
+    width = screen_w // 4
+    height = screen_h // 12
     x = screen_w - width - 40
     y = int(screen_h*0.05)
 
@@ -48,6 +48,7 @@ def show_rating_toast(text, rating, duration):
 
     background_color = "#141414"  # Default dark background
     text_color = "#FFFFFF"        # Default white text
+    font_size = 18
 
     if rating >= 9.7:
         background_color = "#1da1f2"  # Blue for highest ratings
@@ -64,6 +65,10 @@ def show_rating_toast(text, rating, duration):
         text_color = "#111111"  
     elif rating >= 5:
         background_color = "#e74c3c"  # Red for bad ratings
+    elif rating < 0:
+        background_color = "#0E0B0B"  # Black for error ratings
+        display_text = f"Could not display rating (only works on fullscreen)!"
+        font_size = 12
     else:
         background_color = "#633974"  # Purple for garbage ratings
 
@@ -76,16 +81,18 @@ def show_rating_toast(text, rating, duration):
         height//2, 
         text=display_text, 
         fill=text_color, 
-        font=("Segoe UI", 18, "bold"),
+        font=("Segoe UI", font_size, "bold"),
         justify="center"
     )
 
     root.after(duration, root.destroy)
     root.mainloop()
 
-# show_rating_toast("Episode 601", 5, duration=4000)
-# show_rating_toast("Episode 601", 9.8, duration=4000)
-# show_rating_toast("Episode 601", 7.5, duration=4000)
-# show_rating_toast("Episode 601", 3.2, duration=4000)
-# show_rating_toast("Episode 601", 8.6, duration=4000)
-# show_rating_toast("Episode 601", 6.4, duration=4000)
+if __name__ == "__main__":
+    pass
+    # show_rating_toast("Episode 601", 5, duration=4000)
+    # show_rating_toast("Episode 601", 9.8, duration=4000)
+    # show_rating_toast("Episode 601", 7.5, duration=4000)
+    # show_rating_toast("Episode 601", 3.2, duration=4000)
+    # show_rating_toast("Episode 601", 8.6, duration=4000)
+    # show_rating_toast("Episode 601", 6.4, duration=4000)

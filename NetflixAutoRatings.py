@@ -1,7 +1,10 @@
 episode_title = "I'm Luffy! The Man Who Will Become the Pirate King!"
 
 def get_rating_by_episode_id(episode_id):
-    ratings = open("title.ratings.tsv", "r", encoding="utf-8")
+    try:
+        ratings = open("title.ratings.tsv", "r", encoding="utf-8")
+    except:
+        return "Error."
     next(ratings)  # Skip header line
 
     for rating_line in ratings:
@@ -16,8 +19,12 @@ def get_rating_by_episode_id(episode_id):
     return "Rating not found."
 
 def get_rating_by_title(title):
-    titles = open("title.basics.tsv", "r", encoding="utf-8")
-    target_title_id = ""
+    try:
+        titles = open("title.basics.tsv", "r", encoding="utf-8")
+        target_title_id = ""
+    except:
+        return "Error."
+    next(titles)  # Skip header line
 
     for title_line in titles:
         split_title_data = title_line.split("\t")
@@ -37,7 +44,10 @@ def get_rating_by_title(title):
 #print(f'Average rating for desired episode: {get_rating_by_title(episode_title)}')
 
 def get_rating_by_episode(target_parent_id, target_episode_num):
-    episodes = open("title.episode.tsv", "r", encoding="utf-8")
+    try:
+        episodes = open("title.episode.tsv", "r", encoding="utf-8")
+    except:
+        return "Error."
     next(episodes) # Skip header line
 
     for episode_line in episodes:
