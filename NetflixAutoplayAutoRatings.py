@@ -37,6 +37,7 @@ skipped_intros = 0
 
 current_episode_number = ""
 current_episode_rating = 0.0
+in_hover_area = False
 
 print(f"Screen size: {screen_size}")
 print("Automatically skipping intro and selecting next episode on Netflix!")
@@ -45,9 +46,19 @@ def move_center():
     p.moveTo(int(screen_x/2), int(screen_y/2), 0)
 
 while True:
-    if p.position().x > 1550 and p.position().y < 200 and current_episode_number != "" and current_episode_rating != 0.0:
-        t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), duration=1000)
+    mouse_in_hover = p.position().x > 1550 and p.position().x < 1920 and p.position().y < 200 and p.position().y > 0 and current_episode_number != "" and current_episode_rating != 0.0
+    
+    if mouse_in_hover and not in_hover_area:
+        t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
+        in_hover_area = True
         print("Displayed toast")
+    elif not mouse_in_hover and in_hover_area:
+        print("Closing toast")
+        t.close_rating_toast()
+        in_hover_area = False
+    
+    # Update toast window if it exists
+    t.update_toast()
 
     # Select next episode button
     try:

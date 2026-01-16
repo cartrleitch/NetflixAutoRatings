@@ -1,5 +1,7 @@
 import tkinter as tk
 
+current_toast_window = None
+
 def round_rectangle(canvas, x1, y1, x2, y2, radius=15, **kwargs):
     points = [x1+radius, y1,
               x1+radius, y1,
@@ -24,7 +26,14 @@ def round_rectangle(canvas, x1, y1, x2, y2, radius=15, **kwargs):
     return canvas.create_polygon(points, smooth=True, **kwargs)
 
 def show_rating_toast(text, rating, duration):
+    global current_toast_window
+    
+    # Close existing toast if any
+    close_rating_toast()
+    
     root = tk.Tk()
+    current_toast_window = root
+    
     root.overrideredirect(True)  # no window borders
     root.attributes("-topmost", True)
     root.attributes("-alpha", 1)  # transparency
@@ -85,8 +94,25 @@ def show_rating_toast(text, rating, duration):
         justify="center"
     )
 
-    root.after(duration, root.destroy)
-    root.mainloop()
+    if duration > 0:
+        root.after(duration, root.destroy)
+
+def close_rating_toast():
+    global current_toast_window
+    if current_toast_window is not None:
+        try:
+            current_toast_window.destroy()
+        except:
+            pass
+        current_toast_window = None
+
+def update_toast():
+    global current_toast_window
+    if current_toast_window is not None:
+        try:
+            current_toast_window.update()
+        except:
+            current_toast_window = None
 
 if __name__ == "__main__":
     pass
