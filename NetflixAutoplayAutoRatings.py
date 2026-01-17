@@ -39,19 +39,37 @@ current_episode_number = ""
 current_episode_rating = 0.0
 in_hover_area = False
 
+series_id = "tt0388629"  # One Piece
+
 print(f"Screen size: {screen_size}")
 print("Automatically skipping intro and selecting next episode on Netflix!")
 
 def move_center():
     p.moveTo(int(screen_x/2), int(screen_y/2), 0)
 
+def get_episode_rating_and_number():
+    title_tuple = et.get_text_from_title_region()
+    print(title_tuple)
+    if title_tuple[1] == "None" or title_tuple[1] == "":
+        print("\n <- Could not extract title tuple. Probably not fullscreen. Trying maximized but not fullscreened.")
+        title_tuple = et.get_text_from_title_region(y=0.87)
+    episode_rating = ar.get_rating_by_episode(series_id, title_tuple[1])
+    return (title_tuple[1], episode_rating)
+
 while True:
-    mouse_in_hover = p.position().x > screen_x*0.8 and p.position().x < screen_x and p.position().y < screen_y*0.18 and p.position().y > 0 and current_episode_number != "" and current_episode_rating != 0.0
+    mouse_in_hover = p.position().x > screen_x*0.8 and p.position().x < screen_x and p.position().y < screen_y*0.18 and p.position().y > 0 
     
     if mouse_in_hover and not in_hover_area:
-        t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
-        in_hover_area = True
-        print("Displayed toast")
+        # If we don't have the current episode number and rating yet, extract it
+        if current_episode_number == "" or current_episode_rating == 0.0:
+            print("Extracting episode number and rating for hover toast...")
+            current_episode_number, current_episode_rating = get_episode_rating_and_number()
+        try:
+            t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
+            in_hover_area = True
+            print("Displayed toast")
+        except Exception as e:
+            print(f"Could not display rating toast due to error: {e}")
     elif not mouse_in_hover and in_hover_area:
         print("Closing toast")
         t.close_rating_toast()
@@ -97,17 +115,9 @@ while True:
         time.sleep(1)
 
         # Extract title and show rating toast
-        title_tuple = et.get_text_from_title_region()
-        print(title_tuple)
-        if title_tuple[1] == "None" or title_tuple[1] == "":
-            print("Could not extract title tuple. Probably not fullscreen. Trying maximized but not fullscreened.")
-            title_tuple = et.get_text_from_title_region(y=0.87)
+        current_episode_number, current_episode_rating = get_episode_rating_and_number()
 
-        episode_rating = ar.get_rating_by_episode("tt0388629", title_tuple[1])
-        current_episode_number = title_tuple[1]
-        current_episode_rating = episode_rating
-
-        print(f"Episode Rating: {episode_rating}")
+        print(f"Episode Rating: {current_episode_rating}")
 
         try:
             t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), duration=4000)

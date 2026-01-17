@@ -22,7 +22,7 @@ def extract_title(text):
 
 def get_text_from_title_region(x=0.17, y=0.92, w=0.6, h=0.05):
     screen_size = p.size()
-    print (f"Screen size: {screen_size}")
+    print (f"\nScreen size: {screen_size}")
     screen_x = screen_size[0]
     screen_y = screen_size[1]
 
@@ -34,6 +34,7 @@ def get_text_from_title_region(x=0.17, y=0.92, w=0.6, h=0.05):
     print("title_window_y:", title_window_y)
     print("title_window_w:", title_window_w)
     print("title_window_h:", title_window_h)
+    print("")   
 
     try:
         screenshot = pyautogui.screenshot(region=(title_window_x, title_window_y, title_window_w, title_window_h))
