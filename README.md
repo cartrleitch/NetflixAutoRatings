@@ -9,3 +9,4 @@ Multi-season series cannot select rating by episode number, because it also need
 Make it work for movies
 Handle user manually change the episode. Reset the stored episode number and rating if this happens. 
 Series lookup issue: series can have same name like One Piece and One Piece
+Finish speeding up other aspects of program (use series dictionary once the above issue is figured out, and find a faster way to search epsidoe ID by primary title)
