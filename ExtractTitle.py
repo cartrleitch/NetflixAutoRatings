@@ -10,6 +10,12 @@ p.FAILSAFE = True
 
 p.pause = 1
 
+def extract_series_title(text):
+    title_match = re.search(r'(.+)\bE\d{1,4}\b', text)
+    if title_match:
+        return title_match.group(1).strip()
+    return text.strip()
+
 def extract_episode_number(text):
     match = re.search(r'\bE(\d{1,4})\b', text)
     return int(match.group(1)) if match else None
@@ -58,10 +64,12 @@ def get_text_from_title_region(x=0.17, y=0.92, w=0.6, h=0.05):
 
     episode_number = str(extract_episode_number(title_text))
     title = extract_title(title_text)
+    series = extract_series_title(title_text)
     print (f"Extracted Episode Number: |{episode_number}|")
     print (f"Extracted Title: |{title}|")
+    print (f"Extracted Series: |{series}|")
     
-    return (title, episode_number, title_text)
+    return (title, episode_number, title_text, series)
 
 if __name__ == "__main__":
     print(get_text_from_title_region())

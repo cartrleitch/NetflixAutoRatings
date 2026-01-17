@@ -74,3 +74,24 @@ def get_rating_by_episode(target_parent_id, target_episode_num):
     return "Rating not found." 
 
 # print(f'Average rating for desired episode: {get_rating_by_episode("tt0388629", "601")}')  # One Piece 
+
+def get_series_id_by_title(series_title):
+    try:
+        titles = open(resource_path("title.basics.tsv"), "r", encoding="utf-8")
+        target_series_id = ""
+    except:
+        return "Error."
+    next(titles)  # Skip header line
+
+    for title_line in titles:
+        split_title_data = title_line.split("\t")
+        title_id = split_title_data[0]
+        title_type = split_title_data[1]
+        primary_title = split_title_data[2]
+
+        if series_title.lower() == primary_title.lower() and title_type == "tvSeries":
+            print(f'Series id: {title_id} for title {primary_title} found.')
+            target_series_id = title_id
+            break
+
+    return target_series_id

@@ -39,7 +39,7 @@ current_episode_number = ""
 current_episode_rating = 0.0
 in_hover_area = False
 
-series_id = "tt0388629"  # One Piece
+series_id = "tt0388629"  # One Piece default series_id
 
 print(f"Screen size: {screen_size}")
 print("Automatically skipping intro and selecting next episode on Netflix!")
@@ -53,7 +53,12 @@ def get_episode_rating_and_number():
     if title_tuple[1] == "None" or title_tuple[1] == "":
         print("\n <- Could not extract title tuple. Probably not fullscreen. Trying maximized but not fullscreened.")
         title_tuple = et.get_text_from_title_region(y=0.87)
+    
+    # Get series ID by series title
+    series_id = ar.get_series_id_by_title(title_tuple[3])
+    # Get episode rating by series ID and episode number
     episode_rating = ar.get_rating_by_episode(series_id, title_tuple[1])
+
     return (title_tuple[1], episode_rating)
 
 while True:
