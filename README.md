@@ -7,3 +7,4 @@ Right now, the only issue is that program requires parent tconst ID (series ID) 
 Todo:
 Multi-season series cannot select rating by episode number, because it also needs the season number. Enable searching by title (where title and parentTconst are correct)
 Make it work for movies
+Handle user manually change the episode. Reset the stored episode number and rating if this happens. 
