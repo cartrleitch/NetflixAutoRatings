@@ -26,7 +26,7 @@ def extract_title(text):
         return title_match.group(1).strip()
     return text.strip()
 
-def get_text_from_title_region(x=0.17, y=0.92, w=0.6, h=0.05):
+def get_text_from_title_region(x=0.19, y=0.92, w=0.5, h=0.05):
     screen_size = p.size()
     print (f"\nScreen size: {screen_size}")
     screen_x = screen_size[0]
