@@ -8,4 +8,3 @@ Todo:
 Enable use for any show on Netflix (maybe have user enter show title on startup, then find that title in title.basics.tsv where its id is also a parent id in title.episode.tsv.). Otherwise, do this but instead of user entering it, find the show based on the title somehow (whether the series name is in the title, or you can find the series by the title).
 Store selected show persistently, reference on startup. 
 Have startup script that can be run to change focused show.
-If you hover over the top right zone and there is a recorded episode rating, find the rating and display it.
