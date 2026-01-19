@@ -69,6 +69,30 @@ def build_series_dict():
     print(f"Loaded {len(series_dict)} unique TV series titles")
     return series_dict
 
+def build_movies_dict():
+    """Build dictionary: {movie_title.lower(): [(movie_id, start_year), ...]}"""
+    print("Building movies dictionary from TSV...")
+    movies_dict = {}
+    
+    with open(resource_path("title.basics.tsv"), "r", encoding="utf-8") as f:
+        next(f)  # Skip header
+        for line in f:
+            parts = line.strip().split("\t")
+            if len(parts) >= 6:
+                title_id = parts[0]
+                title_type = parts[1]
+                primary_title = parts[2]
+                start_year = parts[5] if parts[5] != "\\N" else "0"
+                
+                if title_type == "movie":
+                    key = primary_title.lower()
+                    if key not in movies_dict:
+                        movies_dict[key] = []
+                    movies_dict[key].append((title_id, start_year))
+    
+    print(f"Loaded {len(movies_dict)} unique movie titles")
+    return movies_dict
+
 def save_cache():
     """Build and save all dictionaries to pickle files"""
     print("\n=== Building dataset cache ===")
@@ -88,11 +112,16 @@ def save_cache():
         pickle.dump(series, f)
     print("Saved cache_series.pkl")
     
+    movies = build_movies_dict()
+    with open("cache_movies.pkl", "wb") as f:
+        pickle.dump(movies, f)
+    print("Saved cache_movies.pkl")
+    
     print("=== Cache build complete ===\n")
 
 def load_cache():
     """Load dictionaries from pickle files, or build if they don't exist"""
-    cache_files = ["cache_ratings.pkl", "cache_episodes.pkl", "cache_series.pkl"]
+    cache_files = ["cache_ratings.pkl", "cache_episodes.pkl", "cache_series.pkl", "cache_movies.pkl"]
     
     # Check if all cache files exist
     if not all(os.path.exists(f) for f in cache_files):
@@ -110,9 +139,10 @@ def load_cache():
     with open("cache_series.pkl", "rb") as f:
         series_dict = pickle.load(f)
     
-    print(f"Cache loaded: {len(ratings_dict)} ratings, {len(episodes_dict)} episodes, {len(series_dict)} series\n")
+    with open("cache_movies.pkl", "rb") as f:
+        movies_dict = pickle.load(f)
     
-    return ratings_dict, episodes_dict, series_dict
+    return ratings_dict, episodes_dict, series_dict, movies_dict
 
 def rebuild_cache():
     """Force rebuild of cache files"""
@@ -122,7 +152,7 @@ def rebuild_cache():
 if __name__ == "__main__":
     # Test: build or load cache
     # rebuild_cache()
-    ratings, episodes, series = load_cache()
+    ratings, episodes, series, movies = load_cache()
     
     # Test lookups
     print("\nTesting lookups:")

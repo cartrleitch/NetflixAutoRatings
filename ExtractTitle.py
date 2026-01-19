@@ -13,8 +13,8 @@ p.pause = 1
 def extract_series_title(text):
     title_match = re.search(r'(.+)\bE\d{1,4}\b', text)
     if title_match:
-        return title_match.group(1).strip()
-    return text.strip()
+        return title_match.group(1).strip("\"'“” ()")
+    return text.strip("\"'“” ()")
 
 def extract_episode_number(text):
     match = re.search(r'\bE(\d{1,4})\b', text)
@@ -23,8 +23,8 @@ def extract_episode_number(text):
 def extract_title(text):
     title_match = re.search(r'\bE\d{1,4}\b\s*(.+)', text)
     if title_match:
-        return title_match.group(1).strip()
-    return text.strip()
+        return title_match.group(1).strip("\"'“” ()")
+    return text.strip("\"'“” ()")
 
 def get_text_from_title_region(x=0.19, y=0.92, w=0.5, h=0.05):
     screen_size = p.size()
@@ -59,6 +59,12 @@ def get_text_from_title_region(x=0.19, y=0.92, w=0.5, h=0.05):
     custom_config = r'--psm 6 tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789:!?. ,\'"-'
     
     title_text = pytesseract.image_to_string(img, lang="eng", config=custom_config)
+    
+    # Post-process: Replace common OCR misreads
+    title_text = title_text.replace('£', 'E')  # Pound symbol often misread as E
+    title_text = title_text.replace('€', 'E')  # Euro symbol often misread as E
+    title_text = title_text.replace('©', 'C')  # Copyright symbol often misread as C
+    title_text = title_text.replace('™', 'TM') # Trademark symbol often misread as TM
 
     print("Extracted Title Text:", title_text)
 

@@ -39,6 +39,8 @@ skipped_recaps = 0
 current_episode_number = ""
 current_episode_rating = 0.0
 cached_series_title = ""
+cached_movie_title = ""
+cached_movie_rating = 0.0
 in_hover_area = False
 
 episodes_watched_ratings = {}
@@ -52,14 +54,46 @@ def move_center():
     p.moveTo(int(screen_x/2), int(screen_y/2), 0)
 
 def get_episode_rating_and_number():
-    global cached_series_title, series_id
-    
+    global cached_series_title, series_id, cached_movie_title, cached_movie_rating
+    title_tuple = ("None", "None", "None", "None")  # (episode_number, episode_rating, title_text, series_title)
+
     # Extract title region text, try different regions if needed
-    title_tuple = et.get_text_from_title_region()
-    print(title_tuple)
-    if title_tuple[1] == "None" or title_tuple[1] == "":
+    fscr_title_tuple = et.get_text_from_title_region()
+    title_tuple = fscr_title_tuple
+    print(fscr_title_tuple)
+
+    # If no episode number found, try different region
+    if fscr_title_tuple[1] == "None" or fscr_title_tuple[1] == "":
         print("\n <- Could not extract title tuple. Probably not fullscreen. Trying maximized but not fullscreened.")
         title_tuple = et.get_text_from_title_region(y=0.87)
+
+        # If still no episode number found, probably a movie. Search movie title only in movie dataset
+        if title_tuple[1] == "None" or title_tuple[1] == "":
+            print("\nCould not find episode number. Probably a movie. Searching for title only.")
+            movie_title = fscr_title_tuple[2].strip("\n ")
+            
+            # Check if movie title is cached
+            if cached_movie_title == movie_title and cached_movie_rating != 0.0:
+                print(f"Using cached movie rating for '{movie_title}'")
+                return ("Movie", str(cached_movie_rating))
+            
+            movie_rating = ar.get_movie_rating_by_title(movie_title)
+            # If still None, try in maximized but not fullscreened
+            if movie_rating is None:
+                print("\nCould not extract title tuple. Probably not fullscreen. Trying maximized but not fullscreened.")
+                movie_title = title_tuple[2].strip("\n ")
+                
+                # Check cache again with new title
+                if cached_movie_title == movie_title and cached_movie_rating != 0.0:
+                    print(f"Using cached movie rating for '{movie_title}'")
+                    return ("Movie", str(cached_movie_rating))
+                    
+                movie_rating = ar.get_movie_rating_by_title(movie_title)
+            
+            # Cache the movie data
+            cached_movie_title = movie_title
+            cached_movie_rating = movie_rating
+            return ("Movie", str(movie_rating))
 
     # If this session has a saved series title, and it is the same as the current series, use that ID; if not, look it up
     current_series_title = title_tuple[3]
@@ -76,6 +110,7 @@ def get_episode_rating_and_number():
         series_id = ar.get_series_id_by_title(current_series_title)
 
     # Get episode rating by series ID and episode number
+    print(series_id, title_tuple[1])
     episode_rating = ar.get_rating_by_episode(series_id, title_tuple[1])
 
     return (title_tuple[1], episode_rating)
@@ -84,12 +119,14 @@ try:
         mouse_in_hover = p.position().x > screen_x*0.8 and p.position().x < screen_x and p.position().y < screen_y*0.18 and p.position().y > 0 
         
         if mouse_in_hover and not in_hover_area:
-            # If we don't have the current episode number and rating yet, extract it
-            if current_episode_number == "" or current_episode_rating == 0.0:
-                print("Extracting episode number and rating for hover toast...")
-                current_episode_number, current_episode_rating = get_episode_rating_and_number()
+            # Always extract to check if series changed
+            print("Extracting episode number and rating for hover toast...")
+            current_episode_number, current_episode_rating = get_episode_rating_and_number()
             try:
-                t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
+                if current_episode_number == "Movie":
+                    t.show_rating_toast("Movie", float(current_episode_rating), 0)
+                else:
+                    t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
                 in_hover_area = True
                 print("Displayed toast")
             except Exception as e:
@@ -98,6 +135,9 @@ try:
             print("Closing toast")
             t.close_rating_toast()
             in_hover_area = False
+            # Clear cached episode data when leaving hover area to force fresh check next time
+            current_episode_number = ""
+            current_episode_rating = 0.0
         
         # Update toast window if it exists
         t.update_toast()
