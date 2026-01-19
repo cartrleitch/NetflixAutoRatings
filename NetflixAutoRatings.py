@@ -1,6 +1,7 @@
 import sys
 import os
 import DatasetCache as cache
+import ShowRatingToast as t
 
 episode_title = "I'm Luffy! The Man Who Will Become the Pirate King!"
 
@@ -50,22 +51,42 @@ def get_rating_by_episode(target_parent_id, target_episode_num):
 # print(f'Average rating for desired episode: {get_rating_by_episode("tt0388629", "601")}')  # One Piece 
 
 def get_series_id_by_title(series_title):
+    # Use cached series_dict for instant lookup
+    matches = series_dict.get(series_title.lower(), [])
+    
+    if not matches:
+        print(f'Series "{series_title}" not found in cache.')
+        return ""
+    
+    # Handle one series with title
+    if len(matches) == 1:
+        series_id = matches[0][0]
+        print(f'Series id: {series_id} for title "{series_title}" found.')
+        return series_id
+    
+    # Handle multiple series with same title
+    t.show_rating_toast(f'Multiple series found for title "{series_title}".\nPlease select the correct one in the console.', -2, duration=4000)
+    print(f'Found {len(matches)} series with title "{series_title}":')
+    match_selection = 1
+    match_dict = {}
+
+    print("Matches: \n")
+    for series_id, year in matches:
+        rating = float(ratings_dict.get(series_id, 0))
+        match_dict[match_selection] = (series_id)
+        print(f'{match_selection}: {series_title} ({year}): Rating {rating}')
+        match_selection += 1
+
     try:
-        titles = open(resource_path("title.basics.tsv"), "r", encoding="utf-8")
-        target_series_id = ""
-    except:
-        return "Error."
-    next(titles)  # Skip header line
+        match_user_choice = int(input("Type the number of the correct series: "))
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+        match_user_choice = int(input("Type the number of the correct series: "))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return ""
+    target_series_id = match_dict.get(match_user_choice, "")
 
-    for title_line in titles:
-        split_title_data = title_line.split("\t")
-        title_id = split_title_data[0]
-        title_type = split_title_data[1]
-        primary_title = split_title_data[2].strip("\n ")
-
-        if series_title.lower() == primary_title.lower() and title_type == "tvSeries":
-            print(f'Series id: {title_id} for title {primary_title} found.')
-            target_series_id = title_id
-            break
-
-    return target_series_id
+    return (target_series_id)
+    
+#print(get_series_id_by_title("One Piece")) # One Piece

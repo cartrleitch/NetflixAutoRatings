@@ -38,11 +38,12 @@ skipped_recaps = 0
 
 current_episode_number = ""
 current_episode_rating = 0.0
+cached_series_title = ""
 in_hover_area = False
 
 episodes_watched_ratings = {}
 
-series_id = "tt0388629"  # One Piece default series_id
+series_id = ""
 
 print(f"Screen size: {screen_size}")
 print("Automatically skipping intro and selecting next episode on Netflix!")
@@ -51,14 +52,29 @@ def move_center():
     p.moveTo(int(screen_x/2), int(screen_y/2), 0)
 
 def get_episode_rating_and_number():
+    global cached_series_title, series_id
+    
+    # Extract title region text, try different regions if needed
     title_tuple = et.get_text_from_title_region()
     print(title_tuple)
     if title_tuple[1] == "None" or title_tuple[1] == "":
         print("\n <- Could not extract title tuple. Probably not fullscreen. Trying maximized but not fullscreened.")
         title_tuple = et.get_text_from_title_region(y=0.87)
-    
-    # Get series ID by series title
-    series_id = ar.get_series_id_by_title(title_tuple[3])
+
+    # If this session has a saved series title, and it is the same as the current series, use that ID; if not, look it up
+    current_series_title = title_tuple[3]
+    # If we don't have a cached series title yet, get it
+    if cached_series_title == "":
+        cached_series_title = title_tuple[3]
+        series_id = ar.get_series_id_by_title(current_series_title)
+
+    # Get series ID by series title if different from cached
+    if cached_series_title == current_series_title:
+        print(f"Using cached series ID for title: {current_series_title}")
+    else:
+        cached_series_title = current_series_title
+        series_id = ar.get_series_id_by_title(current_series_title)
+
     # Get episode rating by series ID and episode number
     episode_rating = ar.get_rating_by_episode(series_id, title_tuple[1])
 

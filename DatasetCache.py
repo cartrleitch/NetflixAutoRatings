@@ -46,7 +46,7 @@ def build_episodes_dict():
     return episodes_dict
 
 def build_series_dict():
-    """Build dictionary: {series_title.lower(): series_id}"""
+    """Build dictionary: {series_title.lower(): [(series_id, start_year), ...]}"""
     print("Building series dictionary from TSV...")
     series_dict = {}
     
@@ -54,15 +54,19 @@ def build_series_dict():
         next(f)  # Skip header
         for line in f:
             parts = line.strip().split("\t")
-            if len(parts) >= 3:
+            if len(parts) >= 6:
                 title_id = parts[0]
                 title_type = parts[1]
                 primary_title = parts[2]
+                start_year = parts[5] if parts[5] != "\\N" else "0"
                 
                 if title_type == "tvSeries":
-                    series_dict[primary_title.lower()] = title_id
+                    key = primary_title.lower()
+                    if key not in series_dict:
+                        series_dict[key] = []
+                    series_dict[key].append((title_id, start_year))
     
-    print(f"Loaded {len(series_dict)} TV series")
+    print(f"Loaded {len(series_dict)} unique TV series titles")
     return series_dict
 
 def save_cache():
@@ -117,6 +121,7 @@ def rebuild_cache():
 
 if __name__ == "__main__":
     # Test: build or load cache
+    # rebuild_cache()
     ratings, episodes, series = load_cache()
     
     # Test lookups

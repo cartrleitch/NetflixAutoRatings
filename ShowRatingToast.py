@@ -74,10 +74,14 @@ def show_rating_toast(text, rating, duration):
         text_color = "#111111"  
     elif rating >= 5:
         background_color = "#e74c3c"  # Red for bad ratings
-    elif rating < 0:
+    elif rating == -1:
         background_color = "#0E0B0B"  # Black for error ratings
         display_text = f"Could not display rating (only works on fullscreen)!"
         font_size = 12
+    elif rating == -2:
+        background_color = "#7f8c8d"  # Gray for multiple series found
+        display_text = f"{text}"
+        font_size = 10
     else:
         background_color = "#633974"  # Purple for garbage ratings
 
