@@ -10,5 +10,3 @@ Handle user manually change the episode. Reset the stored episode number and rat
 Series lookup issue: series can have same name like One Piece and One Piece
 Finish speeding up other aspects of program (use series dictionary once the above issue is figured out, and find a faster way to search episode ID by primary title)
 Make sure the pickled cache of dictionaries works in the executable.
-Add skip recap (can get screenshot from One Piece episode 616)
-On ending program, show info like episodes watched
