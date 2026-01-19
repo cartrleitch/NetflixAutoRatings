@@ -54,6 +54,7 @@ print(f'Average rating for desired episode: {get_rating_by_episode("tt11737520",
 def get_series_id_by_title(series_title):
     # Use cached series_dict for instant lookup
     matches = series_dict.get(series_title.lower(), [])
+    series_title = series_title.upper()
     
     if not matches:
         print(f'Series "{series_title}" not found in cache.')
@@ -114,7 +115,8 @@ def get_series_id_by_title(series_title):
 def get_movie_rating_by_title(movie_title):
     matches = movies_dict.get(movie_title.lower(), [])
     print(matches)
-    
+    movie_title = movie_title.upper()
+
     if not matches:
         print(f'Movie "{movie_title}" not found in cache.')
         return None

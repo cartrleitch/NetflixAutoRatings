@@ -43,7 +43,7 @@ cached_movie_title = ""
 cached_movie_rating = 0.0
 in_hover_area = False
 
-episodes_watched_ratings = {}
+episodes_watched_ratings = []
 
 series_id = ""
 
@@ -73,7 +73,7 @@ def get_episode_rating_and_number():
             movie_title = fscr_title_tuple[2].strip("\n ")
             
             # Check if movie title is cached
-            if cached_movie_title == movie_title and cached_movie_rating != 0.0:
+            if cached_movie_title.lower() == movie_title.lower() and cached_movie_rating != 0.0:
                 print(f"Using cached movie rating for '{movie_title}'")
                 return ("Movie", str(cached_movie_rating))
             
@@ -84,14 +84,14 @@ def get_episode_rating_and_number():
                 movie_title = title_tuple[2].strip("\n ")
                 
                 # Check cache again with new title
-                if cached_movie_title == movie_title and cached_movie_rating != 0.0:
+                if cached_movie_title.lower() == movie_title.lower() and cached_movie_rating != 0.0:
                     print(f"Using cached movie rating for '{movie_title}'")
                     return ("Movie", str(cached_movie_rating))
                     
                 movie_rating = ar.get_movie_rating_by_title(movie_title)
             
             # Cache the movie data
-            cached_movie_title = movie_title
+            cached_movie_title = movie_title.upper()
             cached_movie_rating = movie_rating
             return ("Movie", str(movie_rating))
 
@@ -99,14 +99,15 @@ def get_episode_rating_and_number():
     current_series_title = title_tuple[3]
     # If we don't have a cached series title yet, get it
     if cached_series_title == "":
-        cached_series_title = title_tuple[3]
+        print(f"First time seeing series: {current_series_title}")
+        cached_series_title = title_tuple[3].upper()
         series_id = ar.get_series_id_by_title(current_series_title)
-
     # Get series ID by series title if different from cached
-    if cached_series_title == current_series_title:
-        print(f"Using cached series ID for title: {current_series_title}")
+    elif cached_series_title == current_series_title.upper():
+        print(f"Using cached series ID '{series_id}' for title: {current_series_title}")
     else:
-        cached_series_title = current_series_title
+        print(f"Series changed from '{cached_series_title}' to '{current_series_title}'")
+        cached_series_title = current_series_title.upper()
         series_id = ar.get_series_id_by_title(current_series_title)
 
     # Get episode rating by series ID and episode number
@@ -182,7 +183,7 @@ try:
             current_episode_number, current_episode_rating = get_episode_rating_and_number()
 
             print(f"Episode Rating: {current_episode_rating}")
-            episodes_watched_ratings[current_episode_number] = float(current_episode_rating)
+            episodes_watched_ratings.append([cached_series_title, current_episode_number, float(current_episode_rating)])    
 
             try:
                 t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), duration=4000)
@@ -225,8 +226,9 @@ finally:
     t.close_rating_toast()
 
     episodes_watched_ratings_list = ""
-    for episode, rating in episodes_watched_ratings.items():
-        episodes_watched_ratings_list += f"\nEpisode {episode}: Rating {rating}"
+    for series, episode, rating in episodes_watched_ratings:
+        episodes_watched_ratings_list += f"\nSeries {series.upper()} Episode {episode}: Rating {rating}"
         
-    print(f"\nTotal episodes watched: {episodes_watched}\nTotal intros skipped: {skipped_intros}\nTotal recaps skipped: {skipped_recaps}\nEpisodes Watched Ratings: {episodes_watched_ratings_list}\nAverage Rating: {sum(episodes_watched_ratings.values())/len(episodes_watched_ratings) if episodes_watched_ratings else 0}")
+    print(f"\nTotal episodes watched: {episodes_watched}\nTotal intros skipped: {skipped_intros}\nTotal recaps skipped: {skipped_recaps}\nEpisodes Watched Ratings: {episodes_watched_ratings_list}\nAverage Rating: {sum(rating for _, _, rating in episodes_watched_ratings)/len(episodes_watched_ratings) if episodes_watched_ratings else 0}")
+
 # One Piece parent tconst: tt0388629
