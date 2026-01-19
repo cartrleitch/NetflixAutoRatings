@@ -10,11 +10,13 @@ p.FAILSAFE = True
 
 p.pause = 1
 
+string_strip = ' "\'‘’“”()-_—=~`,.<>:;!@#$%^&*[]{}\\/|'
+
 def extract_series_title(text):
     title_match = re.search(r'(.+)\bE\d{1,4}\b', text)
     if title_match:
-        return title_match.group(1).strip("\"'“” ()")
-    return text.strip("\"'“” ()")
+        return title_match.group(1).strip(string_strip)
+    return text.strip(string_strip)
 
 def extract_episode_number(text):
     match = re.search(r'\bE(\d{1,4})\b', text)
@@ -23,8 +25,8 @@ def extract_episode_number(text):
 def extract_title(text):
     title_match = re.search(r'\bE\d{1,4}\b\s*(.+)', text)
     if title_match:
-        return title_match.group(1).strip("\"'“” ()")
-    return text.strip("\"'“” ()")
+        return title_match.group(1).strip(string_strip)
+    return text.strip(string_strip)
 
 def get_text_from_title_region(x=0.19, y=0.92, w=0.5, h=0.05):
     screen_size = p.size()

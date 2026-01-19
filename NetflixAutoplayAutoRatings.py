@@ -26,11 +26,7 @@ p.pause = 1
 screen_size = p.size()
 screen_x = screen_size[0]
 screen_y = screen_size[1]
-
-title_window_x = int(screen_x * 0.05)
-title_window_y = int(screen_y * 0.06)
-title_window_w = int(screen_x * 0.5)
-title_window_h = int(screen_y * 0.14)
+is_4k = screen_x >= 3840
 
 episodes_watched = 0
 skipped_intros = 0
@@ -52,6 +48,11 @@ print("Automatically skipping intro and selecting next episode on Netflix!")
 
 def move_center():
     p.moveTo(int(screen_x/2), int(screen_y/2), 0)
+
+def locate_button(button_name, confidence=0.8):
+    """Locate a button image on screen based on resolution"""
+    suffix = '4k125percent' if is_4k else '100percent'
+    return p.locateCenterOnScreen(resource_path(f'{button_name}{suffix}.png'), confidence=confidence)
 
 def get_episode_rating_and_number():
     global cached_series_title, series_id, cached_movie_title, cached_movie_rating
@@ -145,76 +146,53 @@ try:
 
         # Select next episode button
         try:
-            if screen_x >= 3840:
-                next_episode_button_location = p.locateCenterOnScreen(resource_path('next_episode4k125percent.png'), confidence=0.6)
-            else:
-                next_episode_button_location = p.locateCenterOnScreen(resource_path('next_episode100percent.png'), confidence=0.6)
-
+            next_episode_button_location = locate_button('next_episode', confidence=0.6)
             print("Locating next episode: " + str(next_episode_button_location))
-            
             p.leftClick(next_episode_button_location)
             move_center()
-            
             episodes_watched += 1
             print("Episodes watched: " + str(episodes_watched))
-
             current_episode_number = "" 
             current_episode_rating = 0.0
-            
         except p.ImageNotFoundException:
-            #print("Next episode button not on screen.")
             pass
 
         # Select skip intro button
         try:
-            if screen_x >= 3840:
-                skip_intro_button_location = p.locateCenterOnScreen(resource_path('skip_intro4k125percent.png'), confidence=0.8)
-            else:
-                skip_intro_button_location = p.locateCenterOnScreen(resource_path('skip_intro100percent.png'), confidence=0.8)
-
+            skip_intro_button_location = locate_button('skip_intro')
             print("Locating skip intro: "+ str(skip_intro_button_location))
             p.leftClick(skip_intro_button_location)
             move_center()
             skipped_intros += 1
             print("Intros skipped: " + str(skipped_intros))
-            time.sleep(1)
+            time.sleep(1.25)
 
             # Extract title and show rating toast
             current_episode_number, current_episode_rating = get_episode_rating_and_number()
-
             print(f"Episode Rating: {current_episode_rating}")
             episodes_watched_ratings.append([cached_series_title, current_episode_number, float(current_episode_rating)])    
 
             try:
                 t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), duration=4000)
-            except ValueError:
-                print("Could not display rating toast due to invalid rating value.")
+            except (ValueError, Exception) as e:
+                print(f"Could not display rating toast: {e}")
                 try:
                     t.show_rating_toast("", -1, duration=4000)
-                    print("Displayed error toast")
-                except Exception as e:
-                    print(f"Could not display rating toast due to error: {e}")
-            except Exception as e:
-                print(f"Could not display rating toast due to error: {e}")
-
+                except Exception as e2:
+                    print(f"Error showing error toast: {e2}")
         except p.ImageNotFoundException:
-            #print("Skip intro button not on screen.")
             pass
 
         # Skip recap button
         try:
-            if screen_x >= 3840:
-                skip_recap_button_location = p.locateCenterOnScreen(resource_path('skip_recap4k125percent.png'), confidence=0.8)
-            else:
-                skip_recap_button_location = p.locateCenterOnScreen(resource_path('skip_recap100percent.png'), confidence=0.8)
+            skip_recap_button_location = locate_button('skip_recap')
             print("Locating skip recap: "+ str(skip_recap_button_location))
             p.leftClick(skip_recap_button_location)
             move_center()
             skipped_recaps += 1
             print("Recaps skipped: " + str(skipped_recaps))
             time.sleep(1)
-        except:
-            #print("Skip recap button not on screen.")
+        except p.ImageNotFoundException:
             pass
 
         time.sleep(0.5)
@@ -225,10 +203,20 @@ except Exception as e:
 finally:
     t.close_rating_toast()
 
-    episodes_watched_ratings_list = ""
-    for series, episode, rating in episodes_watched_ratings:
-        episodes_watched_ratings_list += f"\nSeries {series.upper()} Episode {episode}: Rating {rating}"
-        
-    print(f"\nTotal episodes watched: {episodes_watched}\nTotal intros skipped: {skipped_intros}\nTotal recaps skipped: {skipped_recaps}\nEpisodes Watched Ratings: {episodes_watched_ratings_list}\nAverage Rating: {sum(rating for _, _, rating in episodes_watched_ratings)/len(episodes_watched_ratings) if episodes_watched_ratings else 0}")
+    # Print session statistics
+    print(f"\n{'='*50}")
+    print(f"SESSION STATISTICS")
+    print(f"{'='*50}")
+    print(f"Episodes watched: {episodes_watched}")
+    print(f"Intros skipped: {skipped_intros}")
+    print(f"Recaps skipped: {skipped_recaps}")
+    
+    if episodes_watched_ratings:
+        print(f"\nEpisodes Watched:")
+        for series, episode, rating in episodes_watched_ratings:
+            print(f"  {series} - Episode {episode}: Rating {rating}")
+        avg_rating = sum(rating for _, _, rating in episodes_watched_ratings) / len(episodes_watched_ratings)
+        print(f"\nAverage Rating: {avg_rating:.2f}")
+    print(f"{'='*50}")
 
 # One Piece parent tconst: tt0388629
