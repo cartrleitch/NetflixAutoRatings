@@ -7,8 +7,6 @@ Todo:
 Multi-season series cannot select rating by episode number, because it also needs the season number. Enable searching by title (where title and parentTconst are correct)
 Make it work for movies
 Handle user manually change the episode. Reset the stored episode number and rating if this happens. 
-Series lookup issue: series can have same name like One Piece and One Piece
+Episodes watched recap should have show title and season if watching multiple things
 Finish speeding up other aspects of program (use series dictionary once the above issue is figured out, and find a faster way to search episode ID by primary title)
 Make sure the pickled cache of dictionaries works in the executable.
-Add skip recap (can get screenshot from One Piece episode 616)
-On ending program, show info like episodes watched
