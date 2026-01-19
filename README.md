@@ -7,3 +7,4 @@ Todo:
 Multi-season series cannot select rating by episode number, because it also needs the season number. Enable searching by title (where title and parentTconst are correct)
 Episodes watched recap should have show title and season if watching multiple things
 Make sure the pickled cache of dictionaries works in the executable.
+Allow selecting correct episode from list without having to tab out to console
