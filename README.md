@@ -5,4 +5,3 @@ Needs Tesseract installed for OCR.
 
 Todo:
 Make sure the pickled cache of dictionaries works in the executable.
-Allow selecting correct episode from list without having to tab out to console
