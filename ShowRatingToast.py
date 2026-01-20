@@ -118,6 +118,130 @@ def update_toast():
         except:
             current_toast_window = None
 
+def show_selection_dialog(title, message, options):
+    """
+    Show a GUI selection dialog with clickable options.
+    
+    Args:
+        title: Dialog title
+        message: Message to display above options
+        options: List of tuples (display_text, value) for each option
+    
+    Returns:
+        Selected value or None if cancelled
+    """
+    selected_value = [None]  # Use list to allow modification in nested function
+    
+    root = tk.Tk()
+    root.title(title)
+    root.attributes("-topmost", True)
+    root.configure(bg="#141414")
+    
+    # Calculate size based on content
+    screen_w = root.winfo_screenwidth()
+    screen_h = root.winfo_screenheight()
+    width = min(600, screen_w // 2)
+    height = min(400, screen_h // 2)
+    x = (screen_w - width) // 2
+    y = (screen_h - height) // 2
+    
+    root.geometry(f"{width}x{height}+{x}+{y}")
+    root.resizable(False, False)
+    
+    # Message label
+    message_label = tk.Label(
+        root, 
+        text=message, 
+        font=("Segoe UI", 12, "bold"),
+        fg="#FFFFFF",
+        bg="#141414",
+        wraplength=width-40,
+        justify="center"
+    )
+    message_label.pack(pady=20)
+    
+    # Frame for buttons with scrollbar if needed
+    button_frame = tk.Frame(root, bg="#141414")
+    button_frame.pack(fill="both", expand=True, padx=20, pady=10)
+    
+    # Canvas and scrollbar for many options
+    canvas = tk.Canvas(button_frame, bg="#141414", highlightthickness=0)
+    scrollbar = tk.Scrollbar(button_frame, orient="vertical", command=canvas.yview)
+    scrollable_frame = tk.Frame(canvas, bg="#141414")
+    
+    scrollable_frame.bind(
+        "<Configure>",
+        lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+    )
+    
+    canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+    canvas.configure(yscrollcommand=scrollbar.set)
+    
+    # Enable mouse wheel scrolling
+    def on_mousewheel(event):
+        canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+    
+    canvas.bind_all("<MouseWheel>", on_mousewheel)
+    
+    def on_select(value):
+        selected_value[0] = value
+        canvas.unbind_all("<MouseWheel>")
+        root.destroy()
+    
+    # Create button for each option
+    for i, (display_text, value) in enumerate(options):
+        btn = tk.Button(
+            scrollable_frame,
+            text=display_text,
+            font=("Segoe UI", 11),
+            bg="#333333",
+            fg="#FFFFFF",
+            activebackground="#555555",
+            activeforeground="#FFFFFF",
+            relief="flat",
+            cursor="hand2",
+            command=lambda v=value: on_select(v)
+        )
+        btn.pack(fill="x", pady=5, padx=10)
+        
+        # Hover effects
+        def on_enter(e):
+            e.widget['bg'] = '#555555'
+        def on_leave(e):
+            e.widget['bg'] = '#333333'
+        
+        btn.bind("<Enter>", on_enter)
+        btn.bind("<Leave>", on_leave)
+    
+    # Pack canvas and scrollbar
+    canvas.pack(side="left", fill="both", expand=True)
+    if len(options) > 6:  # Show scrollbar only if many options
+        scrollbar.pack(side="right", fill="y")
+    
+    # Cancel button
+    cancel_btn = tk.Button(
+        root,
+        text="Cancel",
+        font=("Segoe UI", 10),
+        bg="#e74c3c",
+        fg="#FFFFFF",
+        activebackground="#c0392b",
+        activeforeground="#FFFFFF",
+        relief="flat",
+        cursor="hand2",
+        command=lambda: [canvas.unbind_all("<MouseWheel>"), root.destroy()]
+    )
+    cancel_btn.pack(pady=5)
+    
+    # Make dialog modal
+    root.grab_set()
+    root.focus_force()
+    
+    # Wait for dialog to close
+    root.mainloop()
+    
+    return selected_value[0]
+
 if __name__ == "__main__":
     pass
     # show_rating_toast("Episode 601", 5, duration=4000)
@@ -126,3 +250,11 @@ if __name__ == "__main__":
     # show_rating_toast("Episode 601", 3.2, duration=4000)
     # show_rating_toast("Episode 601", 8.6, duration=4000)
     # show_rating_toast("Episode 601", 6.4, duration=4000)
+    
+        # Test selection dialog
+    # options = [
+    #     ("ONE PIECE (1999): Rating 9.0", "tt0388629"),
+    #     ("ONE PIECE (2023): Rating 8.3", "tt11737520"),
+    # ]
+    # result = show_selection_dialog("Select Series", "Multiple series found. Select the correct one:", options)
+    # print(f"Selected: {result}")

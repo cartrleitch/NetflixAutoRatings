@@ -127,29 +127,30 @@ def get_series_id_by_title(series_title):
         return series_id 
 
     # Handle multiple series with same title
-    t.show_rating_toast(f'Multiple series found for title "{series_title}".\nPlease select the correct one in the console.', -2, duration=4000)
+    t.show_rating_toast(f'Multiple series found for title "{series_title}".\nPlease select in the popup.', -2, duration=4000)
     print(f'Found {len(matches)} series with title "{series_title}":')
-    match_selection = 1
-    match_dict = {}
-
-    print("Matches:")
+    
+    # Build options for GUI dialog
+    options = []
     for series_id, year in matches:
         rating = float(ratings_dict.get(series_id, 0))
-        match_dict[match_selection] = (series_id)
-        print(f'{match_selection}: {series_title} ({year}): Series Rating {rating}')
-        match_selection += 1
-
-    try:
-        match_user_choice = int(input("Type the number of the correct series: "))
-    except ValueError:
-        print("Invalid input. Please enter a number.")
-        match_user_choice = int(input("Type the number of the correct series: "))
-    except Exception as e:
-        print(f"An error occurred: {e}")
+        display_text = f"{series_title} ({year}): Rating {rating}"
+        options.append((display_text, series_id))
+        print(f'{series_title} ({year}): Series Rating {rating}')
+    
+    # Show GUI selection dialog
+    target_series_id = t.show_selection_dialog(
+        "Select Series",
+        f'Multiple series found for "{series_title}".\nSelect the correct one:',
+        options
+    )
+    
+    if target_series_id:
+        print(f"User selected series ID: {target_series_id}")
+        return target_series_id
+    else:
+        print("User cancelled series selection")
         return ""
-    target_series_id = match_dict.get(match_user_choice, "")
-
-    return (target_series_id)
     
 def get_movie_rating_by_title(movie_title):
     matches = movies_dict.get(movie_title.lower(), [])
@@ -188,36 +189,38 @@ def get_movie_rating_by_title(movie_title):
         return rating
                    
     # Handle multiple movies with same title
-    t.show_rating_toast(f'Multiple movies found for title "{movie_title}".\nPlease select the correct one in the console.', -2, duration=4000)
+    t.show_rating_toast(f'Multiple movies found for title "{movie_title}".\nPlease select in the popup.', -2, duration=4000)
     print(f'Found {len(matches)} movies with title "{movie_title}":')
-    match_selection = 1
-    match_dict = {}
-
-    print("Matches:")
+    
+    # Build options for GUI dialog
+    options = []
     for movie in matches:
         movie_id = movie[0]
         movie_year = movie[1]
         rating = float(ratings_dict.get(movie_id, 0))
-        match_dict[match_selection] = (movie_id)
-        print(f'{match_selection}: {movie_title} ({movie_year}): Rating {rating}')
-        match_selection += 1
-
-    try:
-        match_user_choice = int(input("Type the number of the correct movie: "))
-    except ValueError:
-        print("Invalid input. Please enter a number.")
-        match_user_choice = int(input("Type the number of the correct movie: "))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return "Error."
-    target_movie_id = match_dict.get(match_user_choice, "")
-    rating = ratings_dict.get(target_movie_id, "Rating not found.")
-
-    return rating
+        display_text = f"{movie_title} ({movie_year}): Rating {rating}"
+        options.append((display_text, movie_id))
+        print(f'{movie_title} ({movie_year}): Rating {rating}')
+    
+    # Show GUI selection dialog
+    target_movie_id = t.show_selection_dialog(
+        "Select Movie",
+        f'Multiple movies found for "{movie_title}".\nSelect the correct one:',
+        options
+    )
+    
+    if target_movie_id:
+        rating = ratings_dict.get(target_movie_id, "Rating not found.")
+        print(f"User selected movie ID: {target_movie_id} with rating {rating}")
+        return rating
+    else:
+        print("User cancelled movie selection")
+        return None
 
 if __name__ == "__main__":
-    print(get_rating_by_episode("tt0903747", "2", "Grilled"))
-    # print(get_movie_rating_by_title("Inception")) # Inception
+    pass
+    # print(get_rating_by_episode("tt0903747", "2", "Grilled"))
+    # print(get_movie_rating_by_title("Superman")) # Inception
     # print(get_series_id_by_title("One Piece")) # One Piece
     # print(f'Average rating for desired episode: {get_rating_by_episode("tt11737520", "1")}')  # One Piece 
-    # print(f'Average rating for desired episode: {get_rating_by_title
+    # print(f'Average rating for desired episode: {get_rating_by_title}
