@@ -5,7 +5,7 @@ import ShowRatingToast as t
 
 episode_title = "I'm Luffy! The Man Who Will Become the Pirate King!"
 
-ratings_dict, episodes_dict, series_dict, movies_dict = cache.load_cache()
+ratings_dict, episodes_dict, series_dict, movies_dict, id_to_title_dict = cache.load_cache()
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -18,7 +18,7 @@ def resource_path(relative_path):
 def get_rating_by_episode_id(episode_id):
     return ratings_dict.get(episode_id, "Rating not found.")
      
-def get_rating_by_title(title):
+def get_rating_by_title(target_title):
     try:
         titles = open(resource_path("title.basics.tsv"), "r", encoding="utf-8")
         target_title_id = ""
@@ -31,7 +31,7 @@ def get_rating_by_title(title):
         title_id = split_title_data[0]
         primary_title = split_title_data[2]
 
-        if episode_title.lower() == primary_title.lower():
+        if target_title.lower() == primary_title.lower():
             print(title_id, primary_title)
             target_title_id = title_id
             break
@@ -41,15 +41,56 @@ def get_rating_by_title(title):
 
     return get_rating_by_episode_id(target_title_id)
      
-#print(f'Average rating for desired episode: {get_rating_by_title(episode_title)}')
-
-def get_rating_by_episode(target_parent_id, target_episode_num):
-    episode_id = episodes_dict.get((target_parent_id.lower(), str(target_episode_num)), "Episode ID not found.")
-    print(episode_id)
-    if episode_id == "Episode ID not found.":
-        return "Episode ID not found."
-    return ratings_dict.get(episode_id, "Rating not found.")
-print(f'Average rating for desired episode: {get_rating_by_episode("tt11737520", "1")}')  # One Piece 
+def get_rating_by_episode(target_parent_id, target_episode_num, target_title=""):
+    """Find episode rating, handling multiple seasons with same episode number"""
+    episode_ids = episodes_dict.get((target_parent_id.lower(), str(target_episode_num)), None)
+    print(episode_ids)
+    
+    if not episode_ids:
+        print(f"Episode {target_episode_num} not found for series {target_parent_id}")
+        return ("Episode ID not found.", "\\N")
+    
+    # Single episode found
+    if len(episode_ids) == 1:
+        episode_id = episode_ids[0][0]
+        season_num = episode_ids[0][1]
+        print(f"Found episode ID: {episode_id}")
+        rating = ratings_dict.get(episode_id, None)
+        return (rating if rating else "No rating", season_num)
+    
+    # Multiple seasons have this episode number, try to match by title if provided
+    print(f"Found {len(episode_ids)} episodes with number {target_episode_num}")
+    
+    # If target title provided, try to match it
+    if target_title:
+        for episode in episode_ids:
+            episode_id = episode[0]
+            season_num = episode[1]
+            title = id_to_title_dict.get(episode_id, "")
+            print(f'Checking episode ID: {episode_id} with title: "{title}" against target title: "{target_title}"')
+            if target_title.lower() in title.lower():
+                print(f'Matched episode title: "{title}" with target title: "{target_title}"')
+                rating = ratings_dict.get(episode_id, None)
+                print(f'Found rating: {rating} for episode ID: {episode_id}')
+                return (rating if rating else "No rating", season_num)
+    
+    # No title match found, return the highest rated episode with this number
+    print("No title match, returning highest rated episode")
+    best_rating = 0.0
+    best_episode = None
+    for episode in episode_ids:
+        episode_id = episode[0]
+        season_num = episode[1]
+        rating = ratings_dict.get(episode_id, None)
+        if rating and float(rating) > best_rating:
+            best_rating = float(rating)
+            best_episode = (rating, season_num)
+    
+    if best_episode:
+        return best_episode
+    
+    # If no ratings found, return first episode's data
+    return ("No rating", episode_ids[0][1])
 
 def get_series_id_by_title(series_title):
     # Use cached series_dict for instant lookup
@@ -95,7 +136,7 @@ def get_series_id_by_title(series_title):
     for series_id, year in matches:
         rating = float(ratings_dict.get(series_id, 0))
         match_dict[match_selection] = (series_id)
-        print(f'{match_selection}: {series_title} ({year}): Rating {rating}')
+        print(f'{match_selection}: {series_title} ({year}): Series Rating {rating}')
         match_selection += 1
 
     try:
@@ -110,8 +151,6 @@ def get_series_id_by_title(series_title):
 
     return (target_series_id)
     
-#print(get_series_id_by_title("One Piece")) # One Piece
-
 def get_movie_rating_by_title(movie_title):
     matches = movies_dict.get(movie_title.lower(), [])
     print(matches)
@@ -176,5 +215,9 @@ def get_movie_rating_by_title(movie_title):
 
     return rating
 
-# print(get_movie_rating_by_title("ee aa")) # Inception
-#print(ratings_dict.get("tt1375666", "Rating not found."))  # Inception
+if __name__ == "__main__":
+    print(get_rating_by_episode("tt0903747", "2", "Grilled"))
+    # print(get_movie_rating_by_title("Inception")) # Inception
+    # print(get_series_id_by_title("One Piece")) # One Piece
+    # print(f'Average rating for desired episode: {get_rating_by_episode("tt11737520", "1")}')  # One Piece 
+    # print(f'Average rating for desired episode: {get_rating_by_title

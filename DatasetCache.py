@@ -28,7 +28,7 @@ def build_ratings_dict():
     return ratings_dict
 
 def build_episodes_dict():
-    """Build dictionary: {(parent_id, episode_num): episode_id}"""
+    """Build dictionary: {(parent_id, episode_num): [episode_id, season_num]}"""
     print("Building episodes dictionary from TSV...")
     episodes_dict = {}
     
@@ -40,7 +40,11 @@ def build_episodes_dict():
                 episode_id = parts[0]
                 parent_id = parts[1].lower()
                 episode_num = parts[3].strip()
-                episodes_dict[(parent_id, episode_num)] = episode_id
+                season_num = parts[2].strip()
+                key = (parent_id, episode_num)
+                if key not in episodes_dict:
+                    episodes_dict[key] = []
+                episodes_dict[key].append([episode_id, season_num])
     
     print(f"Loaded {len(episodes_dict)} episodes")
     return episodes_dict
@@ -93,6 +97,23 @@ def build_movies_dict():
     print(f"Loaded {len(movies_dict)} unique movie titles")
     return movies_dict
 
+def build_id_to_title_dict():
+    """Build dictionary: {title_id: primary_title}"""
+    print("Building ID to title dictionary from TSV...")
+    id_to_title_dict = {}
+    
+    with open(resource_path("title.basics.tsv"), "r", encoding="utf-8") as f:
+        next(f)  # Skip header
+        for line in f:
+            parts = line.strip().split("\t")
+            if len(parts) >= 3:
+                title_id = parts[0]
+                primary_title = parts[2]
+                id_to_title_dict[title_id] = primary_title
+    
+    print(f"Loaded {len(id_to_title_dict)} title IDs")
+    return id_to_title_dict
+
 def save_cache():
     """Build and save all dictionaries to pickle files"""
     print("\n=== Building dataset cache ===")
@@ -117,11 +138,16 @@ def save_cache():
         pickle.dump(movies, f)
     print("Saved cache_movies.pkl")
     
+    id_to_title = build_id_to_title_dict()
+    with open("cache_id_to_title.pkl", "wb") as f:
+        pickle.dump(id_to_title, f)
+    print("Saved cache_id_to_title.pkl")
+    
     print("=== Cache build complete ===\n")
 
 def load_cache():
     """Load dictionaries from pickle files, or build if they don't exist"""
-    cache_files = ["cache_ratings.pkl", "cache_episodes.pkl", "cache_series.pkl", "cache_movies.pkl"]
+    cache_files = ["cache_ratings.pkl", "cache_episodes.pkl", "cache_series.pkl", "cache_movies.pkl", "cache_id_to_title.pkl"]
     
     # Check if all cache files exist
     if not all(os.path.exists(f) for f in cache_files):
@@ -142,7 +168,9 @@ def load_cache():
     with open("cache_movies.pkl", "rb") as f:
         movies_dict = pickle.load(f)
     
-    return ratings_dict, episodes_dict, series_dict, movies_dict
+    with open("cache_id_to_title.pkl", "rb") as f:
+        id_to_title_dict = pickle.load(f)
+    return ratings_dict, episodes_dict, series_dict, movies_dict, id_to_title_dict
 
 def rebuild_cache():
     """Force rebuild of cache files"""
@@ -151,14 +179,20 @@ def rebuild_cache():
 
 if __name__ == "__main__":
     # Test: build or load cache
-    # rebuild_cache()
-    ratings, episodes, series, movies = load_cache()
+    rebuild_cache()
+    ratings, episodes, series, movies, id_to_title = load_cache()
     
     # Test lookups
     print("\nTesting lookups:")
     print(f"One Piece series ID: {series.get('one piece', 'Not found')}")
     print(f"Episode (tt0388629, 610): {episodes.get(('tt0388629', '610'), 'Not found')}")
+    print(f"Rating for tt0388629: {ratings.get('tt0388629', 'Not found')}")
+    print(f"Movie Inception ID: {movies.get('inception', 'Not found')}")
+    print(f"Title for tt2081647: {id_to_title.get('tt2081647', 'Not found')}")
     
-    episode_id = episodes.get(('tt0388629', '610'), None)
-    if episode_id:
-        print(f"Rating for episode {episode_id}: {ratings.get(episode_id, 'Not found')}")
+    # episode_ids = episodes.get(('tt0388629', '610'), None)
+    # if episode_ids:
+    #     print(f"Found {len(episode_ids)} episode(s):")
+    #     for ep_id in episode_ids:
+    #         rating = ratings.get(ep_id, 'Not found')
+    #         print(f"  Episode {ep_id}: Rating {rating}")

@@ -76,7 +76,7 @@ def get_episode_rating_and_number():
             # Check if movie title is cached
             if cached_movie_title.lower() == movie_title.lower() and cached_movie_rating != 0.0:
                 print(f"Using cached movie rating for '{movie_title}'")
-                return ("Movie", str(cached_movie_rating))
+                return ("Movie", str(cached_movie_rating), "\\N")
             
             movie_rating = ar.get_movie_rating_by_title(movie_title)
             # If still None, try in maximized but not fullscreened
@@ -87,14 +87,14 @@ def get_episode_rating_and_number():
                 # Check cache again with new title
                 if cached_movie_title.lower() == movie_title.lower() and cached_movie_rating != 0.0:
                     print(f"Using cached movie rating for '{movie_title}'")
-                    return ("Movie", str(cached_movie_rating))
+                    return ("Movie", str(cached_movie_rating), "\\N")
                     
                 movie_rating = ar.get_movie_rating_by_title(movie_title)
             
             # Cache the movie data
             cached_movie_title = movie_title.upper()
-            cached_movie_rating = movie_rating
-            return ("Movie", str(movie_rating))
+            cached_movie_rating = movie_rating if movie_rating else 0.0
+            return ("Movie", str(movie_rating), "\\N")
 
     # If this session has a saved series title, and it is the same as the current series, use that ID; if not, look it up
     current_series_title = title_tuple[3]
@@ -112,10 +112,12 @@ def get_episode_rating_and_number():
         series_id = ar.get_series_id_by_title(current_series_title)
 
     # Get episode rating by series ID and episode number
-    print(series_id, title_tuple[1])
-    episode_rating = ar.get_rating_by_episode(series_id, title_tuple[1])
+    episode_num = title_tuple[1]
+    episode_title = title_tuple[0] 
+    print(f"Getting rating for Series ID: {series_id}, Episode Number: {episode_num}, Episode Title: {episode_title}")
+    episode_rating, season_num = ar.get_rating_by_episode(series_id, episode_num, episode_title)
 
-    return (title_tuple[1], episode_rating)
+    return (episode_num, episode_rating, season_num)
 try: 
     while True:
         mouse_in_hover = p.position().x > screen_x*0.8 and p.position().x < screen_x and p.position().y < screen_y*0.18 and p.position().y > 0 
@@ -123,12 +125,16 @@ try:
         if mouse_in_hover and not in_hover_area:
             # Always extract to check if series changed
             print("Extracting episode number and rating for hover toast...")
-            current_episode_number, current_episode_rating = get_episode_rating_and_number()
+            current_episode_number, current_episode_rating, current_episode_season = get_episode_rating_and_number()
             try:
                 if current_episode_number == "Movie":
                     t.show_rating_toast("Movie", float(current_episode_rating), 0)
                 else:
-                    t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
+                    print(f"Current episode season: {current_episode_season}")
+                    if current_episode_season != "\\N":
+                        t.show_rating_toast(f"S{current_episode_season}E{current_episode_number}", float(current_episode_rating), 0)
+                    else:
+                        t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
                 in_hover_area = True
                 print("Displayed toast")
             except Exception as e:
@@ -168,12 +174,15 @@ try:
             time.sleep(1.25)
 
             # Extract title and show rating toast
-            current_episode_number, current_episode_rating = get_episode_rating_and_number()
+            current_episode_number, current_episode_rating, current_episode_season = get_episode_rating_and_number()
             print(f"Episode Rating: {current_episode_rating}")
-            episodes_watched_ratings.append([cached_series_title, current_episode_number, float(current_episode_rating)])    
+            episodes_watched_ratings.append([cached_series_title, f"S{current_episode_season}E{current_episode_number}" if current_episode_season != "\\N" else f"Episode {current_episode_number}", float(current_episode_rating)])    
 
             try:
-                t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), duration=4000)
+                if current_episode_season != "\\N":
+                    t.show_rating_toast(f"S{current_episode_season}E{current_episode_number}", float(current_episode_rating), duration=4000)
+                else:
+                    t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), duration=4000)
             except (ValueError, Exception) as e:
                 print(f"Could not display rating toast: {e}")
                 try:
@@ -214,7 +223,7 @@ finally:
     if episodes_watched_ratings:
         print(f"\nEpisodes Watched:")
         for series, episode, rating in episodes_watched_ratings:
-            print(f"  {series} - Episode {episode}: Rating {rating}")
+            print(f"  {series} - {episode}: Rating {rating}")
         avg_rating = sum(rating for _, _, rating in episodes_watched_ratings) / len(episodes_watched_ratings)
         print(f"\nAverage Rating: {avg_rating:.2f}")
     print(f"{'='*50}")
