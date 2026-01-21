@@ -4,4 +4,4 @@ MUST have Netflix at 100% scale on 1080p or 125% on 4k.
 Needs Tesseract installed for OCR.
 
 Todo:
-Make sure the pickled cache of dictionaries works in the executable.
+Don't strip ending punctuation from extracted title, namely exclamation points.
