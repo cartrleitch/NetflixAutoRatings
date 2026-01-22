@@ -5,3 +5,4 @@ Needs Tesseract installed for OCR.
 
 Todo:
 Don't strip ending punctuation from extracted title, namely exclamation points.
+Store session statistics persistently with date. Make sure stats are accurate. 
