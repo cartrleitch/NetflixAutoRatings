@@ -1,4 +1,5 @@
 import tkinter as tk
+from MyLogger import logger
 
 current_toast_window = None
 

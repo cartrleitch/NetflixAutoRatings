@@ -1,1 +1,64 @@
 
+
+==================================================
+SESSION STATISTICS - 02-02-2026 20:09:56
+==================================================
+Episodes watched: 0
+Recaps skipped: 0
+Episodes Watched:
+   NARUTO - S1E2: Rating 7.0
+
+Average Rating of Watched Episodes: 7.00
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-02-2026 20:11:15
+==================================================
+Episodes watched: 0
+Recaps skipped: 0
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-02-2026 20:14:52
+==================================================
+Episodes watched: 0
+Recaps skipped: 0
+Episodes Watched:
+   NARUTO - S1E2: Rating 7.0
+   THE WOLF OF WALL STREET - Movie: Rating 8.2
+
+Average Rating of Watched Episodes: 7.60
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-02-2026 20:18:53
+==================================================
+Episodes watched: 0
+Recaps skipped: 0
+Watched:
+   BREAKING BAD - S4E11: Rating 9.7
+
+Average Rating of Watched Episodes: 9.70
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-02-2026 20:19:44
+==================================================
+Episodes watched: 1
+Recaps skipped: 0
+Watched:
+   BREAKING BAD - S4E11: Rating 9.7
+
+Average Rating of Watched Episodes: 9.70
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-02-2026 20:20:25
+==================================================
+Episodes watched: 0
+Recaps skipped: 0
+Watched:
+   NARUTO - S1E2: Rating 7.0
+
+Average Rating of Watched Episodes: 7.0
+==================================================

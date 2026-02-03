@@ -6,14 +6,7 @@ import logging
 import NetflixAutoRatings as ar
 import ExtractTitle as et
 import ShowRatingToast as t
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    datefmt='%H:%M:%S'
-)
-logger = logging.getLogger(__name__)
+from MyLogger import logger
 
 # Netflix must be 100% scale for the images to be detected properly on 1920x1080 or 125% on 4k.
 
@@ -144,16 +137,19 @@ try:
                 if current_episode_number == "Movie":
                     t.show_rating_toast("Movie", float(current_episode_rating), 0)
                     watched_statistics[cached_movie_title] = (cached_movie_title, cached_movie_rating, "Movie")
+                    logger.debug("Displayed movie toast")
 
                 else:
                     logger.debug(f"Current episode season: {current_episode_season}")
                     if current_episode_season != "\\N":
                         t.show_rating_toast(f"S{current_episode_season}E{current_episode_number}", float(current_episode_rating), 0)
                         watched_statistics[cached_series_title] = (cached_series_title, current_episode_rating, f"S{current_episode_season}E{current_episode_number}")
+                        logger.debug("Displayed episode toast")
 
                     else:
                         t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
                         watched_statistics[cached_series_title] = (cached_series_title, current_episode_rating, f"E{current_episode_number}")
+                        logger.debug("Displayed episode toast")
 
                 in_hover_area = True
                 logger.debug("Displayed toast")
@@ -237,11 +233,11 @@ finally:
     session_statistics = f"\n{'='*50}\nSESSION STATISTICS - {time.strftime("%m-%d-%Y %H:%M:%S", time.localtime())}\n{'='*50}\nEpisodes watched: {skipped_intros}\nRecaps skipped: {skipped_recaps}"
 
     if watched_statistics:
-        session_statistics += f"\nEpisodes Watched:"
+        session_statistics += f"\nWatched:"
         for value in watched_statistics.values():
             session_statistics += f"\n   {value[0]} - {value[2]}: Rating {value[1]}"
         avg_rating = sum(float(rating) for _, rating, _ in watched_statistics.values()) / len(watched_statistics)
-        session_statistics += f"\n\nAverage Rating of Watched Episodes: {avg_rating:.2f}"
+        session_statistics += f"\n\nAverage Rating of Watched Episodes: {avg_rating:.1f}"
     session_statistics += f"\n{'='*50}\n"
     print(session_statistics)
 

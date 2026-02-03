@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import pytesseract
 import re
+from MyLogger import logger
 
 p = pyautogui
 
@@ -30,7 +31,7 @@ def extract_title(text):
 
 def get_text_from_title_region(x=0.19, y=0.92, w=0.5, h=0.05):
     screen_size = p.size()
-    print (f"\nScreen size: {screen_size}")
+    logger.debug(f"Screen size: {screen_size}")
     screen_x = screen_size[0]
     screen_y = screen_size[1]
 
@@ -38,18 +39,14 @@ def get_text_from_title_region(x=0.19, y=0.92, w=0.5, h=0.05):
     title_window_y = int(screen_y * y)
     title_window_w = int(screen_x * w)
     title_window_h = int(screen_y * h)
-    print("title_window_x:", title_window_x)
-    print("title_window_y:", title_window_y)
-    print("title_window_w:", title_window_w)
-    print("title_window_h:", title_window_h)
-    print("")   
+    logger.debug(f"Title window - x: {title_window_x}, y: {title_window_y}, w: {title_window_w}, h: {title_window_h}")   
 
     try:
         screenshot = pyautogui.screenshot(region=(title_window_x, title_window_y, title_window_w, title_window_h))
         screenshot.save("netflix_title_raw.png")
-        print("Screenshot saved as netflix_title_raw.png")
+        logger.debug("Screenshot saved as netflix_title_raw.png")
     except Exception as e:
-        print("Error taking screenshot:", e)
+        logger.error(f"Error taking screenshot: {e}")
         return None, None, None
 
     img = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
@@ -68,14 +65,14 @@ def get_text_from_title_region(x=0.19, y=0.92, w=0.5, h=0.05):
     title_text = title_text.replace('©', 'C')  # Copyright symbol often misread as C
     title_text = title_text.replace('™', 'TM') # Trademark symbol often misread as TM
 
-    print("Extracted Title Text:", title_text)
+    logger.debug(f"Extracted Title Text: {title_text}")
 
     episode_number = str(extract_episode_number(title_text))
     title = extract_title(title_text)
     series = extract_series_title(title_text)
-    print (f"Extracted Episode Number: |{episode_number}|")
-    print (f"Extracted Title: |{title}|")
-    print (f"Extracted Series: |{series}|")
+    logger.debug(f"Extracted Episode Number: |{episode_number}|")
+    logger.debug(f"Extracted Title: |{title}|")
+    logger.debug(f"Extracted Series: |{series}|")
     
     return (title, episode_number, title_text, series)
 
