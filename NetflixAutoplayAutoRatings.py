@@ -54,6 +54,31 @@ def locate_button(button_name, confidence=0.8):
     suffix = '4k125percent' if is_4k else '100percent'
     return p.locateCenterOnScreen(resource_path(f'{button_name}{suffix}.png'), confidence=confidence)
 
+def handle_movie_rating(fscr_movie_title, maximized_movie_title):
+    global cached_movie_title, cached_movie_rating
+    movie_title = fscr_movie_title
+
+    # Check if movie title is cached
+    if cached_movie_title.lower() == movie_title.lower() and cached_movie_rating != 0.0:
+        print(f"Using cached movie rating for '{movie_title}'")
+        return ("Movie", str(cached_movie_rating), "\\N")
+    
+    movie_rating = ar.get_movie_rating_by_title(movie_title)
+    # If still None, try in maximized but not fullscreened
+    if movie_rating is None:
+        print("\nCould not extract title tuple. Probably not fullscreen. Trying maximized but not fullscreened.")
+        movie_title = maximized_movie_title
+        # Check cache again with new title
+        if cached_movie_title.lower() == movie_title.lower() and cached_movie_rating != 0.0:
+            print(f"Using cached movie rating for '{movie_title}'")
+            return ("Movie", str(cached_movie_rating), "\\N")    
+        movie_rating = ar.get_movie_rating_by_title(movie_title)
+
+    # Cache the movie data
+    cached_movie_title = movie_title.upper()
+    cached_movie_rating = movie_rating if movie_rating else 0.0
+    return ("Movie", str(movie_rating), "\\N")
+
 def get_episode_rating_and_number():
     global cached_series_title, series_id, cached_movie_title, cached_movie_rating
     title_tuple = ("None", "None", "None", "None")  # (episode_number, episode_rating, title_text, series_title)
@@ -71,30 +96,8 @@ def get_episode_rating_and_number():
         # If still no episode number found, probably a movie. Search movie title only in movie dataset
         if title_tuple[1] == "None" or title_tuple[1] == "":
             print("\nCould not find episode number. Probably a movie. Searching for title only.")
-            movie_title = fscr_title_tuple[2].strip("\n ")
-            
-            # Check if movie title is cached
-            if cached_movie_title.lower() == movie_title.lower() and cached_movie_rating != 0.0:
-                print(f"Using cached movie rating for '{movie_title}'")
-                return ("Movie", str(cached_movie_rating), "\\N")
-            
-            movie_rating = ar.get_movie_rating_by_title(movie_title)
-            # If still None, try in maximized but not fullscreened
-            if movie_rating is None:
-                print("\nCould not extract title tuple. Probably not fullscreen. Trying maximized but not fullscreened.")
-                movie_title = title_tuple[2].strip("\n ")
-                
-                # Check cache again with new title
-                if cached_movie_title.lower() == movie_title.lower() and cached_movie_rating != 0.0:
-                    print(f"Using cached movie rating for '{movie_title}'")
-                    return ("Movie", str(cached_movie_rating), "\\N")
-                    
-                movie_rating = ar.get_movie_rating_by_title(movie_title)
-            
-            # Cache the movie data
-            cached_movie_title = movie_title.upper()
-            cached_movie_rating = movie_rating if movie_rating else 0.0
-            return ("Movie", str(movie_rating), "\\N")
+            print(f"Extracted movie data: {fscr_title_tuple}")
+            return handle_movie_rating(fscr_title_tuple[2].strip("\n "), title_tuple[2].strip("\n "))
 
     # If this session has a saved series title, and it is the same as the current series, use that ID; if not, look it up
     current_series_title = title_tuple[3]
@@ -118,6 +121,8 @@ def get_episode_rating_and_number():
     episode_rating, season_num = ar.get_rating_by_episode(series_id, episode_num, episode_title)
 
     return (episode_num, episode_rating, season_num)
+
+# Main loop
 try: 
     while True:
         mouse_in_hover = p.position().x > screen_x*0.8 and p.position().x < screen_x and p.position().y < screen_y*0.18 and p.position().y > 0 
