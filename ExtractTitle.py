@@ -10,7 +10,7 @@ p.FAILSAFE = True
 
 p.pause = 1
 
-string_strip = ' "\'‘’“”()-_—=~`,.<>:;!@#$%^&*[]{}\\/|'
+string_strip = ' "\'‘’“”()-_—=~`,<>:;@#$%^&*[]{}\\/|'
 
 def extract_series_title(text):
     title_match = re.search(r'(.+)\bE\d{1,4}\b', text)

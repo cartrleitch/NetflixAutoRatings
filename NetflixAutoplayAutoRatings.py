@@ -156,8 +156,6 @@ try:
             print("Locating next episode: " + str(next_episode_button_location))
             p.leftClick(next_episode_button_location)
             move_center()
-            episodes_watched += 1
-            print("Episodes watched: " + str(episodes_watched))
             current_episode_number = "" 
             current_episode_rating = 0.0
         except p.ImageNotFoundException:
@@ -210,22 +208,26 @@ except KeyboardInterrupt:
 except Exception as e:
     print(f"\nProgram Ended Unexpectedly: {e}")
 finally:
-    t.close_rating_toast()
+    try:
+        t.close_rating_toast()
+    except Exception as e:
+        print(f"Error closing rating toast: {e}")
 
     # Print session statistics
-    print(f"\n{'='*50}")
-    print(f"SESSION STATISTICS")
-    print(f"{'='*50}")
-    print(f"Episodes watched: {episodes_watched}")
-    print(f"Intros skipped: {skipped_intros}")
-    print(f"Recaps skipped: {skipped_recaps}")
-    
-    if episodes_watched_ratings:
-        print(f"\nEpisodes Watched:")
-        for series, episode, rating in episodes_watched_ratings:
-            print(f"  {series} - {episode}: Rating {rating}")
-        avg_rating = sum(rating for _, _, rating in episodes_watched_ratings) / len(episodes_watched_ratings)
-        print(f"\nAverage Rating: {avg_rating:.2f}")
-    print(f"{'='*50}")
+    session_statistics = f"\n{'='*50}\nSESSION STATISTICS - {time.strftime("%m-%d-%Y %H:%M:%S", time.localtime())}\n{'='*50}\nEpisodes watched: {skipped_intros}\nRecaps skipped: {skipped_recaps}"
 
-# One Piece parent tconst: tt0388629
+    if episodes_watched_ratings:
+        session_statistics += f"\nEpisodes Watched:"
+        for series, episode, rating in episodes_watched_ratings:
+            session_statistics += f"\n  {series} - {episode}: Rating {rating}"
+        avg_rating = sum(rating for _, _, rating in episodes_watched_ratings) / len(episodes_watched_ratings)
+        session_statistics += f"\n\nAverage Rating of Watched Episodes: {avg_rating:.2f}"
+    session_statistics += f"\n{'='*50}\n"
+    print(session_statistics)
+
+    with open("Netflix_Session_Statistics.txt", "a", encoding="utf-8") as stats_file:
+        stats_file.write(session_statistics)
+        
+    print("Session statistics saved to Netflix_Session_Statistics.txt")
+    
+    os._exit(0)
