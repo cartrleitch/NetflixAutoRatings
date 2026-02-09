@@ -62,3 +62,114 @@ Watched:
 
 Average Rating of Watched Episodes: 7.0
 ==================================================
+
+==================================================
+SESSION STATISTICS - 02-06-2026 00:25:15
+==================================================
+Episodes watched: 0
+Recaps skipped: 0
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-06-2026 01:02:48
+==================================================
+Episodes watched: 4
+Recaps skipped: 0
+Watched:
+   ONE PIECE - S1E654: Rating 7.9
+
+Average Rating of Watched Episodes: 7.9
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-06-2026 22:53:13
+==================================================
+Episodes watched: 2
+Recaps skipped: 0
+Watched:
+   ONE PIECE - S1E656: Rating 7.7
+
+Average Rating of Watched Episodes: 7.7
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-09-2026 17:13:50
+==================================================
+Episodes watched: 0
+Recaps skipped: 0
+Watched:
+   BREAKING BAD - S4E11: Rating 9.7
+
+Average Rating of Watched Episodes: 9.7
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-09-2026 17:16:28
+==================================================
+Episodes watched: 1
+Recaps skipped: 0
+Intros skipped: 1
+Watched:
+   BREAKING BAD - S4E1: Rating 9.2
+
+Average Rating of Watched Episodes: 9.2
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-09-2026 17:21:14
+==================================================
+Episodes watched: 1
+Recaps skipped: 0
+Intros skipped: 0
+Watched:
+   BREAKING BAD - S4E2: Rating 8.2
+
+Average Rating of Watched Episodes: 8.2
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-09-2026 17:24:41
+==================================================
+Episodes watched: 0
+Recaps skipped: 0
+Intros skipped: 0
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-09-2026 17:27:28
+==================================================
+Episodes watched: 1
+Recaps skipped: 0
+Intros skipped: 0
+Watched:
+   BREAKING BAD - S4E3: Rating 8.0
+
+Average Rating of Watched Episodes: 8.0
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-09-2026 17:28:46
+==================================================
+Episodes watched: 2
+Recaps skipped: 0
+Intros skipped: 0
+Watched:
+   BREAKING BAD - S4E3: Rating 8.0
+   BREAKING BAD - S4E4: Rating 8.5
+
+Average Rating of Watched Episodes: 8.2
+==================================================
+
+==================================================
+SESSION STATISTICS - 02-09-2026 17:29:33
+==================================================
+Episodes watched: 3
+Recaps skipped: 0
+Intros skipped: 1
+Watched:
+   BREAKING BAD - S4E4: Rating 8.5
+   BREAKING BAD - S4E5: Rating 8.6
+   BREAKING BAD - S4E6: Rating 8.4
+
+Average Rating of Watched Episodes: 8.5
+==================================================

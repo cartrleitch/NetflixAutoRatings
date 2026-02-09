@@ -2,7 +2,6 @@ import pyautogui
 import time
 import sys
 import os
-import logging
 import NetflixAutoRatings as ar
 import ExtractTitle as et
 import ShowRatingToast as t
@@ -137,19 +136,19 @@ try:
                 if current_episode_number == "Movie":
                     t.show_rating_toast("Movie", float(current_episode_rating), 0)
                     watched_statistics[cached_movie_title] = (cached_movie_title, cached_movie_rating, "Movie")
-                    logger.debug("Displayed movie toast")
+                    logger.debug("Displayed movie toast - cached data")
 
                 else:
                     logger.debug(f"Current episode season: {current_episode_season}")
                     if current_episode_season != "\\N":
                         t.show_rating_toast(f"S{current_episode_season}E{current_episode_number}", float(current_episode_rating), 0)
-                        watched_statistics[cached_series_title] = (cached_series_title, current_episode_rating, f"S{current_episode_season}E{current_episode_number}")
-                        logger.debug("Displayed episode toast")
+                        watched_statistics[cached_series_title, current_episode_season, current_episode_number] = (cached_series_title, current_episode_rating, f"S{current_episode_season}E{current_episode_number}")
+                        logger.debug("Displayed episode toast - cached data")
 
                     else:
                         t.show_rating_toast(f"Episode {current_episode_number}", float(current_episode_rating), 0)
-                        watched_statistics[cached_series_title] = (cached_series_title, current_episode_rating, f"E{current_episode_number}")
-                        logger.debug("Displayed episode toast")
+                        watched_statistics[cached_series_title, current_episode_number] = (cached_series_title, current_episode_rating, f"E{current_episode_number}")
+                        logger.debug("Displayed episode toast - cached data")
 
                 in_hover_area = True
                 logger.debug("Displayed toast")
@@ -190,7 +189,7 @@ try:
             # Extract title and show rating toast
             current_episode_number, current_episode_rating, current_episode_season = get_episode_rating_and_number()
             logger.info(f"Episode Rating: {current_episode_rating}")
-            watched_statistics[cached_series_title] = (cached_series_title, current_episode_rating, f"S{current_episode_season}E{current_episode_number}" if current_episode_season != "\\N" else f"E{current_episode_number}")
+            watched_statistics[cached_series_title, current_episode_season, current_episode_number] = (cached_series_title, current_episode_rating, f"S{current_episode_season}E{current_episode_number}" if current_episode_season != "\\N" else f"E{current_episode_number}")
 
             try:
                 if current_episode_season != "\\N":
@@ -230,9 +229,10 @@ finally:
         logger.error(f"Error closing rating toast: {e}")
 
     # Print session statistics
-    session_statistics = f"\n{'='*50}\nSESSION STATISTICS - {time.strftime("%m-%d-%Y %H:%M:%S", time.localtime())}\n{'='*50}\nEpisodes watched: {skipped_intros}\nRecaps skipped: {skipped_recaps}"
+    session_statistics = f"\n{'='*50}\nSESSION STATISTICS - {time.strftime("%m-%d-%Y %H:%M:%S", time.localtime())}\n{'='*50}\nEpisodes watched: {len(watched_statistics)}\nRecaps skipped: {skipped_recaps}\nIntros skipped: {skipped_intros}"
 
     if watched_statistics:
+        logger.debug(f"Watched statistics raw: {watched_statistics}")
         session_statistics += f"\nWatched:"
         for value in watched_statistics.values():
             session_statistics += f"\n   {value[0]} - {value[2]}: Rating {value[1]}"
